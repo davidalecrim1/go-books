@@ -1,5 +1,5 @@
 -- schema.sql
-CREATE TABLE books (
+CREATE TABLE IF NOT EXISTS books (
     ID     INTEGER PRIMARY KEY,
     Title  TEXT NOT NULL,
     Author TEXT NOT NULL,
