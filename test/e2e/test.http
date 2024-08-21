@@ -1,12 +1,12 @@
 # Uses the REST Client Extension in VS Code for Tests
 
-GET http://localhost:8080/books
+GET http://localhost:8090/books
 Accept: application/json
 
-GET http://localhost:8080/books/1
+GET http://localhost:8090/books/1
 Accept: application/json
 
-POST http://localhost:8080/books
+POST http://localhost:8090/books
 Content-Type: application/json
 
 {
@@ -16,7 +16,17 @@ Content-Type: application/json
     "year": 2003
 }
 
-PUT http://localhost:8080/books/1
+POST http://localhost:8090/books
+Content-Type: application/json
+
+{
+    "title": "Clean Architecture",
+    "author": "Robert C. Martin",
+    "genre": "Software Engineering",
+    "year": 2009
+}
+
+PUT http://localhost:8090/books/1
 Content-Type: application/json
 
 {
@@ -26,5 +36,16 @@ Content-Type: application/json
     "year": 2003
 }
 
-DELETE http://localhost:8080/books/1
+DELETE http://localhost:8090/books/1
 Content-Type: application/json
+
+POST http://localhost:8090/books/simulations/read
+Content-Type: application/json
+
+{
+    "id": [
+        1,
+        2,
+        3
+    ]
+}

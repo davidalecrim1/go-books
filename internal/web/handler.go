@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type BookHandler struct {
@@ -65,7 +66,7 @@ func (h *BookHandler) GetBookById(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	book, err := h.service.GetBook(id)
+	book, err := h.service.GetBookById(id)
 
 	if err != nil {
 		http.Error(w, "failed to get book", http.StatusInternalServerError)
@@ -138,4 +139,32 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+}
+
+type SimulationRequest struct {
+	IDs []int `json:"id"`
+}
+
+type SimulationResponse struct {
+	Messages []string `json:"messages"`
+}
+
+// SimulateMultipleReading with POST /books/simulations/read
+func (h *BookHandler) SimulateMultipleReading(w http.ResponseWriter, r *http.Request) {
+	var request SimulationRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+
+	if err != nil {
+
+		http.Error(w, "invalid request payload", http.StatusBadRequest)
+		return
+	}
+
+	results := h.service.SimulateMultipleReading(request.IDs, time.Second*2)
+	response := SimulationResponse{
+		Messages: results,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
