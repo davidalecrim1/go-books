@@ -1,5 +1,6 @@
-# go-books
+# Go Books
+A project to practice some Go features and architecture.
 
 
 # References
-- https://www.youtube.com/watch?v=uBVRCCnVnsg
+- Based on [Full Cycle Videos](https://www.youtube.com/watch?v=uBVRCCnVnsg)
