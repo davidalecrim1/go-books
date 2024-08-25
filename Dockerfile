@@ -8,5 +8,5 @@ FROM alpine:latest
 RUN apk add --no-cache sqlite-libs
 COPY --from=builder /app/server /server
 COPY --from=builder /app/sql /sql
-ENV PORT=8090
+ENV PORT=8080
 CMD ["./server"]

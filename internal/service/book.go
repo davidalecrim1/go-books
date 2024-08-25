@@ -1,7 +1,6 @@
 package service
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
@@ -20,81 +19,40 @@ func (b *Book) GetFullBook() string {
 }
 
 type BookService struct {
-	db *sql.DB
+	repo BookRepository
 }
 
-func NewBookService(db *sql.DB) *BookService {
-	return &BookService{db: db}
+type BookRepository interface {
+	CreateBook(book *Book) error
+	GetBooks() ([]Book, error)
+	GetBookById(id int) (*Book, error)
+	UpdateBook(book *Book) error
+	DeleteBook(id int) error
+	SearchBooksByName(name string) ([]Book, error)
+}
+
+func NewBookService(repo BookRepository) *BookService {
+	return &BookService{repo: repo}
 }
 
 func (s *BookService) CreateBook(book *Book) error {
-	query := "INSERT INTO books (title, author, genre, year) VALUES (?, ?, ?, ?)"
-
-	_, err := s.db.Exec(query, book.Title, book.Author, book.Genre, book.Year)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.repo.CreateBook(book)
 }
 
 func (s *BookService) GetBooks() ([]Book, error) {
-	query := "SELECT id, title, author, genre, year FROM books"
-
-	rows, err := s.db.Query(query)
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var books []Book
-
-	for rows.Next() {
-		var book Book
-
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre, &book.Year)
-
-		if err != nil {
-			return nil, err
-		}
-
-		books = append(books, book)
-	}
-
-	return books, nil
+	return s.repo.GetBooks()
 }
 
 func (s *BookService) GetBookById(id int) (*Book, error) {
-	query := "SELECT id, title, author, genre, year FROM books WHERE id = ?"
-
-	row := s.db.QueryRow(query, id)
-
-	var book Book
-
-	err := row.Scan(&book.ID, &book.Title, &book.Author, &book.Genre, &book.Year)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &book, nil
+	return s.repo.GetBookById(id)
 }
 
 func (s *BookService) UpdateBook(book *Book) error {
-	query := "UPDATE books SET title = ?, author = ?, genre = ?, year = ? WHERE id = ?"
-	_, err := s.db.Exec(query, book.Title, book.Author, book.Genre, book.Year, book.ID)
-
-	return err
+	return s.repo.UpdateBook(book)
 }
 
 func (s *BookService) DeleteBook(id int) error {
-	query := "DELETE FROM books WHERE id = ?"
-	_, err := s.db.Exec(query, id)
-
-	return err
+	return s.repo.DeleteBook(id)
 }
 
 func (s *BookService) SimulateReading(bookId int, duration time.Duration, results chan<- string) {
@@ -129,28 +87,5 @@ func (s *BookService) SimulateMultipleReading(bookIds []int, duration time.Durat
 }
 
 func (s *BookService) SearchBooksByName(name string) ([]Book, error) {
-	query := "SELECT id, title, author, genre, year FROM books WHERE title LIKE ?"
-	rows, err := s.db.Query(query, "%"+name+"%")
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
-
-	var books []Book
-
-	for rows.Next() {
-		var book Book
-
-		err := rows.Scan(&book.ID, &book.Title, &book.Author, &book.Genre, &book.Year)
-
-		if err != nil {
-			return nil, err
-		}
-
-		books = append(books, book)
-	}
-
-	return books, nil
+	return s.repo.SearchBooksByName(name)
 }

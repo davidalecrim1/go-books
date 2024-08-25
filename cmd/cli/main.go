@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"go-books/internal/cli"
+	"go-books/internal/repository"
 	"go-books/internal/service"
 	"log"
 	"os"
@@ -17,20 +18,9 @@ func main() {
 	}
 	defer db.Close()
 
-	sqlFile, err := os.ReadFile("./sql/schema.sql")
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	_, err = db.Exec(string(sqlFile))
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Println("sql script for schema executed successfully!")
-
-	bookService := service.NewBookService(db)
+	bookRepository := repository.NewBookDBRepository(db)
+	bookRepository.SetupSchema("./sql/schema.sql")
+	bookService := service.NewBookService(bookRepository)
 
 	if len(os.Args) > 1 && (os.Args[1] == "search" || os.Args[1] == "simulate") {
 		bookCli := cli.NewBookCli(bookService)
